@@ -23,14 +23,39 @@ npm install
 npx playwright install chromium   # еднократно за извличане на текстове
 ```
 
-### Интеграция с OpenCode
+### Инсталация с една команда (копирай → пейстни → готово)
+
+След като си клонирал repo-то и си пуснал `npm install`, остава само да кажеш на твоя MCP harness къде се намира сървърът. **Това става с един JSON блок**, който добавяш в конфигурационния файл на съответния инструмент.
+
+#### Къде да сложа конфигурацията?
+
+| Harness | Файл за редакция | Къде се намира |
+|---|---|---|
+| **OpenCode** | `opencode.json` | `~/.config/opencode/opencode.json` |
+| **Claude Desktop** | `claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) или `%APPDATA%\Claude\claude_desktop_config.json` (Windows) |
+| **Cursor** | `mcp.json` | `.cursor/mcp.json` в корена на проекта |
+| **Windsurf** | `mcp_config.json` | `~/.codeium/windsurf/mcp_config.json` |
+| **Codex** | `opencode.json` | `~/.config/opencode/opencode.json` (същият като OpenCode) |
+
+#### ⚠️ Важно: замени пътя
+
+Във всеки пример по-долу **трябва да замениш** `/absolute/path/to/bg-parliament-mcp` с реалния път до директорията на твоята машина. За да намериш пътя:
+
+```bash
+cd bg-parliament-mcp && pwd
+# Примерен изход: /Users/ivan/Code/bg-parliament-mcp
+```
+
+#### OpenCode / Codex — добави в `opencode.json`
+
+Влез в секцията `"mcp"` и добави нов запис:
 
 ```json
 {
   "mcp": {
     "bg-parliament": {
       "type": "local",
-      "command": ["node", "/пълен/път/до/bg-parliament-mcp/index.js"],
+      "command": ["node", "/absolute/path/to/bg-parliament-mcp/index.js"],
       "enabled": true,
       "timeout": 45000
     }
@@ -38,18 +63,55 @@ npx playwright install chromium   # еднократно за извличане
 }
 ```
 
-### Интеграция с Claude Desktop / Cursor
+Ако файлът вече има други MCP сървъри (като `"github"`, `"playwright"` и т.н.), просто добави `"bg-parliament"` като нов ключ в същия `"mcp"` обект — **не** създавай нов `"mcp"` блок.
+
+#### Claude Desktop — добави в `claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "bg-parliament": {
       "command": "node",
-      "args": ["/пълен/път/до/bg-parliament-mcp/index.js"]
+      "args": ["/absolute/path/to/bg-parliament-mcp/index.js"],
+      "env": {
+        "PARLIAMENT_TIMEOUT_MS": "30000",
+        "PARLIAMENT_RETRIES": "2"
+      }
     }
   }
 }
 ```
+
+#### Cursor / Windsurf — добави в `mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "bg-parliament": {
+      "command": "node",
+      "args": ["/absolute/path/to/bg-parliament-mcp/index.js"]
+    }
+  }
+}
+```
+
+#### Проверка, че работи
+
+След като си добавил конфигурацията, рестартирай harness-а и попитай:
+
+> *"Какви инструменти са достъпни от parliament MCP сървъра?"*
+
+Ако видиш списък с 55 инструмента (започващи с `parliament_`), значи всичко е наред.
+
+#### 🧠 Бонус: добави и agent дефиницията (flying start)
+
+За да получиш максимална стойност веднага, **копирай съдържанието на [`AGENT.md`](AGENT.md)** като нов агент в твоя harness. Това дава на AI-то контекст как да използва правилно инструментите — да проверява факти, да кръстосва данни, да не превежда имена, да цитира източници.
+
+- **OpenCode:** създай файл `~/.config/opencode/agents/civic-parliament.md` със съдържанието на `AGENT.md`
+- **Claude Desktop:** добави съдържанието като custom system prompt
+- **Cursor:** добави като `.cursorrules` или project rule
+
+---
 
 ### Какво можеш да питаш (примери)
 
@@ -115,16 +177,41 @@ npm install
 npx playwright install chromium   # one-time setup for bill text extraction
 ```
 
-Then add to your MCP client:
+Now pick your harness below, copy the JSON block, replace the path, and you're done.
 
-### OpenCode
+## Installation: One JSON Block, Drop It In
+
+After cloning and `npm install`, all you need is **one JSON block** added to your MCP harness config file. No API keys. No environment setup. No accounts.
+
+### Where to put the config
+
+| Harness | Config File | Location |
+|---|---|---|
+| **OpenCode** | `opencode.json` | `~/.config/opencode/opencode.json` |
+| **Claude Desktop** | `claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) |
+| **Cursor** | `mcp.json` | `.cursor/mcp.json` in your project root |
+| **Windsurf** | `mcp_config.json` | `~/.codeium/windsurf/mcp_config.json` |
+| **Codex** | `opencode.json` | `~/.config/opencode/opencode.json` (same as OpenCode) |
+
+### ⚠️ Replace the path
+
+Every example below uses `/absolute/path/to/bg-parliament-mcp`. **Replace this** with the actual path to your cloned repository. Find it with:
+
+```bash
+cd bg-parliament-mcp && pwd
+# Example output: /Users/ivan/Code/bg-parliament-mcp
+```
+
+### OpenCode / Codex — add to `opencode.json`
+
+Find the `"mcp"` section in your config and add a new entry. If you already have other MCP servers, add `"bg-parliament"` as a new key inside the existing `"mcp"` object — do **not** create a second `"mcp"` block.
 
 ```json
 {
   "mcp": {
     "bg-parliament": {
       "type": "local",
-      "command": ["node", "/path/to/bg-parliament-mcp/index.js"],
+      "command": ["node", "/absolute/path/to/bg-parliament-mcp/index.js"],
       "enabled": true,
       "timeout": 45000
     }
@@ -132,14 +219,14 @@ Then add to your MCP client:
 }
 ```
 
-### Claude Desktop
+### Claude Desktop — add to `claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "bg-parliament": {
       "command": "node",
-      "args": ["/path/to/bg-parliament-mcp/index.js"],
+      "args": ["/absolute/path/to/bg-parliament-mcp/index.js"],
       "env": {
         "PARLIAMENT_TIMEOUT_MS": "30000",
         "PARLIAMENT_RETRIES": "2"
@@ -149,9 +236,7 @@ Then add to your MCP client:
 }
 ```
 
-### Cursor / Windsurf / Codex
-
-Add to your MCP config (`.cursor/mcp.json` or equivalent):
+### Cursor / Windsurf — add to `mcp.json`
 
 ```json
 {
@@ -164,12 +249,21 @@ Add to your MCP config (`.cursor/mcp.json` or equivalent):
 }
 ```
 
-### Any MCP-compatible client (generic)
+### Verify it worked
 
-```bash
-node /path/to/bg-parliament-mcp/index.js
-# Server starts on stdio — connect any MCP host to this process
-```
+Restart your harness and ask:
+
+> *"What tools are available from the parliament MCP server?"*
+
+You should see a list of 55 tools, all prefixed with `parliament_`.
+
+### 🧠 Bonus: Agent definition (flying start)
+
+For maximum value immediately, **copy the contents of [`AGENT.md`](AGENT.md)** as a custom agent in your harness. This teaches the AI how to use the tools correctly — cross-reference data, verify facts, preserve Bulgarian names, and cite sources.
+
+- **OpenCode:** create `~/.config/opencode/agents/civic-parliament.md` with the contents of `AGENT.md`
+- **Claude Desktop:** add as a custom system prompt
+- **Cursor:** add as a `.cursorrules` or project rule
 
 ---
 

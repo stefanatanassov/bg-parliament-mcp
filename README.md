@@ -194,6 +194,30 @@ cd bg-parliament-mcp && pwd
 
 MIT — свободно ползване, модифициране и разпространение. Данните са от публичното API на Народното събрание.
 
+### 🌐 Remote сървър (за ChatGPT, Claude mobile, телефон)
+
+Сървърът поддържа и HTTP транспорт — качи го веднъж на хостинг и го ползвай от **всяко устройство**, включително телефон.
+
+```bash
+npm run remote
+# → http://localhost:3000/mcp
+```
+
+**Deploy:** Railway, Render, Hostinger, VPS — стандартно Express.js приложение. Подробни инструкции в [английската секция](#-remote-deployment-use-from-chatgpt-claude-mobile-phone) по-долу.
+
+**Свързване от ChatGPT/Claude mobile:**
+
+```json
+{
+  "mcpServers": {
+    "bg-parliament": {
+      "type": "url",
+      "url": "https://your-host.com/mcp"
+    }
+  }
+}
+```
+
 ---
 
 ## 🇬🇧 English
@@ -417,6 +441,78 @@ The `parliament_get_bill_text` tool is the key differentiator. The upstream API 
 | DOCX | ⏳ Coming soon | State budget, social security |
 
 ---
+
+## 🌐 Remote Deployment (use from ChatGPT, Claude mobile, phone)
+
+The server also runs over HTTP — deploy it once and connect from **any device** through any remote MCP client.
+
+### Start the remote server
+
+```bash
+npm run remote
+# → http://localhost:3000/mcp
+```
+
+The `/mcp` endpoint speaks the MCP Streamable HTTP protocol (SSE). It's **stateless** — no sessions, no database, no Redis. Each request is independent.
+
+### Deploy to a public host
+
+The remote server is a standard Express.js app. Deploy it anywhere:
+
+**Option A: Railway / Render / Fly.io (free tiers)**
+
+```bash
+# These platforms auto-detect Node.js. Just push the repo:
+git push
+# Set start command: npm run remote
+# Set PORT env var if needed (they provide it automatically)
+```
+
+**Option B: Hostinger (Agency Plan, Node.js hosting)**
+
+```bash
+# Create a deployment archive (exclude node_modules)
+zip -r deploy.zip . -x "node_modules/*" ".git/*" "tests/*"
+# Upload via hPanel or the Hostinger MCP API, then trigger the Node.js build
+```
+
+**Option C: Any VPS (DigitalOcean, Hetzner, Linode)**
+
+```bash
+ssh your-vps
+git clone https://github.com/stefanatanassov/bg-parliament-mcp.git
+cd bg-parliament-mcp && npm install --production
+# Optional: install Playwright for bill text extraction
+npx playwright install chromium
+# Run with PM2 for persistence
+npm install -g pm2
+pm2 start remote.js --name bg-parliament
+```
+
+### Connect from a remote MCP client
+
+Once deployed, point any remote MCP client to `https://your-host.com/mcp`:
+
+```json
+{
+  "mcpServers": {
+    "bg-parliament": {
+      "type": "url",
+      "url": "https://your-host.com/mcp"
+    }
+  }
+}
+```
+
+This works from **ChatGPT desktop, Claude mobile, Cursor, Windsurf** — anything that supports remote MCP servers. No local Node.js needed. No Playwright needed (bill text extraction degrades gracefully).
+
+### Without Playwright (serverless-friendly)
+
+If your hosting doesn't support headless Chromium (serverless, shared hosting), the bill text extraction tool returns a clear message instead of failing:
+
+> *"Bill text extraction requires Playwright. Install with: npx playwright install chromium"*
+
+All 54 other tools work perfectly without it.
 
 ## Evergreen Prompts
 

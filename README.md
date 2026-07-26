@@ -23,6 +23,42 @@ npm install
 npx playwright install chromium   # еднократно за извличане на текстове
 ```
 
+### 🤖 Инсталационен prompt — дай на AI-то да го направи
+
+**Копирай този текст и го пейстни директно в твоя AI harness (OpenCode, Claude, Cursor, Codex).** AI-то ще изпълни всички стъпки вместо теб.
+
+```
+Clone and install the Bulgarian Parliament MCP server:
+
+1. Run:
+   git clone https://github.com/stefanatanassov/bg-parliament-mcp.git /tmp/bg-parliament-mcp
+   cd /tmp/bg-parliament-mcp && npm install
+   npx playwright install chromium
+
+2. Read /tmp/bg-parliament-mcp/AGENT.md to understand the agent configuration.
+
+3. Detect which MCP harness I am running in (OpenCode, Claude Desktop, Cursor, Windsurf, or Codex).
+
+4. Configure this MCP server in the correct config file for my harness:
+   - OpenCode / Codex: add "bg-parliament" to the "mcp" section in ~/.config/opencode/opencode.json
+   - Claude Desktop: add "bg-parliament" to "mcpServers" in the claude_desktop_config.json
+   - Cursor / Windsurf: add "bg-parliament" to "mcpServers" in the project's .cursor/mcp.json
+
+5. Also create the civic-parliament agent from AGENT.md so I can invoke it.
+
+6. After configuration, restart the harness and verify by asking me to list available parliament tools.
+
+7. When done, tell me "Готово — парламентът е свързан. Попитай ме нещо за законите."
+```
+
+След като AI-то приключи, попитай нещо от рода на:
+
+> *"Колко народни представители има в 52-рото Народно събрание и кои са парламентарните групи?"*
+
+Ако видиш отговор с реални данни (240 депутати, 6 групи), значи всичко работи.
+
+---
+
 ### Инсталация с една команда (копирай → пейстни → готово)
 
 След като си клонирал repo-то и си пуснал `npm install`, остава само да кажеш на твоя MCP harness къде се намира сървърът. **Това става с един JSON блок**, който добавяш в конфигурационния файл на съответния инструмент.
@@ -176,6 +212,40 @@ cd bg-parliament-mcp
 npm install
 npx playwright install chromium   # one-time setup for bill text extraction
 ```
+
+### 🤖 Installation Prompt — Let Your AI Do It
+
+**Copy this text and paste it directly into your AI harness (OpenCode, Claude, Cursor, Codex).** The AI will run all installation steps for you.
+
+```
+Clone and install the Bulgarian Parliament MCP server:
+
+1. Run:
+   git clone https://github.com/stefanatanassov/bg-parliament-mcp.git /tmp/bg-parliament-mcp
+   cd /tmp/bg-parliament-mcp && npm install
+   npx playwright install chromium
+
+2. Read /tmp/bg-parliament-mcp/AGENT.md to understand the agent configuration.
+
+3. Detect which MCP harness I am running in: OpenCode, Claude Desktop, Cursor, Windsurf, or Codex.
+
+4. Configure this MCP server in the correct config file:
+   - OpenCode / Codex: add "bg-parliament" to the "mcp" section in ~/.config/opencode/opencode.json
+   - Claude Desktop: add "bg-parliament" to "mcpServers" in claude_desktop_config.json
+   - Cursor / Windsurf: add "bg-parliament" to "mcpServers" in .cursor/mcp.json
+
+5. Also create the civic-parliament agent from AGENT.md so I can invoke it directly.
+
+6. Restart and verify: ask me to list the available parliament tools.
+
+7. Confirm: "Ready — parliament is connected. Try asking me about Bulgarian laws."
+```
+
+After the AI finishes, test it:
+
+> *"How many MPs are in the 52nd National Assembly and what are the parliamentary groups?"*
+
+If you get real data back (240 MPs, 6 groups), everything works.
 
 Now pick your harness below, copy the JSON block, replace the path, and you're done.
 
